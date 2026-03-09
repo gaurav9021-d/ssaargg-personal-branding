@@ -1,0 +1,11 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+.env
+.env.*.local
+backend/node_modules/
+backend/.env
+backend/serviceAccountKey.json
+backend/temp-storage.json
+.DS_Store

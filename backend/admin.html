@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Submissions Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .contacts {
+            padding: 30px;
+        }
+
+        .contact {
+            border: 1px solid #e1e5e9;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .contact:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .contact.new {
+            border-left: 5px solid #28a745;
+            background: linear-gradient(to right, rgba(40, 167, 69, 0.05), transparent);
+        }
+
+        .contact.read {
+            border-left: 5px solid #ffc107;
+            background: linear-gradient(to right, rgba(255, 193, 7, 0.05), transparent);
+        }
+
+        .contact.replied {
+            border-left: 5px solid #007bff;
+            background: linear-gradient(to right, rgba(0, 123, 255, 0.05), transparent);
+        }
+
+        .contact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .contact-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.2em;
+        }
+
+        .meta {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .priority {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .priority.high {
+            background: #dc3545;
+            color: white;
+        }
+
+        .priority.medium {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .priority.low {
+            background: #6c757d;
+            color: white;
+        }
+
+        .contact-subject {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .contact-message {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-read {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-replied {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-email {
+            background: #28a745;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #dc3545;
+        }
+
+        .no-contacts {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .contact-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .contact-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📧 Contact Submissions</h1>
+            <p>Manage your website inquiries</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-count">0</div>
+                <div class="stat-label">Total Submissions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="new-count">0</div>
+                <div class="stat-label">New Messages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="read-count">0</div>
+                <div class="stat-label">Read Messages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="replied-count">0</div>
+                <div class="stat-label">Replied Messages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="feedback-count">0</div>
+                <div class="stat-label">Total Feedback</div>
+            </div>
+        </div>
+
+        <div class="tabs" id="tabs">
+            <button class="tab-btn active" onclick="showTab('contacts')">📧 Contact Messages</button>
+            <button class="tab-btn" onclick="showTab('feedbacks')">⭐ Feedback</button>
+        </div>
+
+        <div class="contacts" id="contacts-container">
+            <div class="loading">Loading contacts...</div>
+        </div>
+
+        <div class="contacts" id="feedbacks-container" style="display: none;">
+            <div class="loading">Loading feedback...</div>
+        </div>
+    </div>
+
+    <script>
+        async function loadContacts() {
+            try {
+                const response = await fetch('/api/contacts');
+                const contacts = await response.json();
+                
+                const container = document.getElementById('contacts-container');
+                
+                if (contacts.length === 0) {
+                    container.innerHTML = '<div class="no-contacts">No contacts yet. Your inbox is empty!</div>';
+                    updateStats([]);
+                    return;
+                }
+                
+                container.innerHTML = contacts.map(contact => `
+                    <div class="contact ${contact.status}">
+                        <div class="contact-header">
+                            <div class="contact-info">
+                                <h3>${contact.name}</h3>
+                                <div class="meta">
+                                    📧 ${contact.email}
+                                    ${contact.phone ? `📱 ${contact.phone}` : ''}
+                                    ${contact.company ? `🏢 ${contact.company}` : ''}
+                                    <br>
+                                    📅 ${new Date(contact.createdAt).toLocaleString()}
+                                </div>
+                            </div>
+                            ${contact.priority ? `<span class="priority ${contact.priority}">${contact.priority}</span>` : ''}
+                        </div>
+                        <div class="contact-subject">${contact.subject || 'No Subject'}</div>
+                        <div class="contact-message">${contact.message}</div>
+                        <div class="contact-actions">
+                            ${contact.status !== 'read' ? `<button class="btn btn-read" onclick="updateStatus('${contact._id}', 'read')">Mark as Read</button>` : ''}
+                            ${contact.status !== 'replied' ? `<button class="btn btn-replied" onclick="updateStatus('${contact._id}', 'replied')">Mark as Replied</button>` : ''}
+                            <a href="mailto:${contact.email}?subject=Re: ${contact.subject}" class="btn btn-email">Reply via Email</a>
+                        </div>
+                    </div>
+                `).join('');
+                
+                updateStats(contacts);
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+                document.getElementById('contacts-container').innerHTML = '<div class="error">Error loading contacts. Please try again.</div>';
+            }
+        }
+        
+        async function loadFeedbacks() {
+            try {
+                const response = await fetch('/api/feedbacks');
+                const feedbacks = await response.json();
+                
+                const container = document.getElementById('feedbacks-container');
+                
+                if (feedbacks.length === 0) {
+                    container.innerHTML = '<div class="no-contacts">No feedback yet. Be the first to share your thoughts!</div>';
+                    return;
+                }
+                
+                container.innerHTML = feedbacks.map(feedback => `
+                    <div class="contact ${feedback.status}">
+                        <div class="contact-header">
+                            <div class="contact-info">
+                                <h3>${feedback.name}</h3>
+                                <div class="meta">
+                                    ⭐ ${feedback.rating}/5 stars
+                                    📧 ${feedback.email}
+                                    <br>
+                                    📅 ${new Date(feedback.createdAt).toLocaleString()}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="contact-subject">Rating: ${'⭐'.repeat(feedback.rating)}${'☆'.repeat(5-feedback.rating)} (${feedback.rating}/5)</div>
+                        <div class="contact-message">${feedback.feedback}</div>
+                        <div class="contact-actions">
+                            ${feedback.status !== 'read' ? `<button class="btn btn-read" onclick="updateFeedbackStatus('${feedback._id}', 'read')">Mark as Read</button>` : ''}
+                            ${feedback.status !== 'reviewed' ? `<button class="btn btn-replied" onclick="updateFeedbackStatus('${feedback._id}', 'reviewed')">Mark as Reviewed</button>` : ''}
+                            <a href="mailto:${feedback.email}?subject=Thank you for your feedback!" class="btn btn-email">Reply via Email</a>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading feedbacks:', error);
+                document.getElementById('feedbacks-container').innerHTML = '<div class="error">Error loading feedback. Please try again.</div>';
+            }
+        }
+        
+        function updateStats(contacts) {
+            const stats = {
+                total: contacts.length,
+                new: contacts.filter(c => c.status === 'new').length,
+                read: contacts.filter(c => c.status === 'read').length,
+                replied: contacts.filter(c => c.status === 'replied').length
+            };
+            
+            document.getElementById('total-count').textContent = stats.total;
+            document.getElementById('new-count').textContent = stats.new;
+            document.getElementById('read-count').textContent = stats.read;
+            document.getElementById('replied-count').textContent = stats.replied;
+        }
+        
+        async function updateStatus(id, status) {
+            try {
+                await fetch(`/api/contacts/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                loadContacts(); // Reload the contacts
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('Error updating status. Please try again.');
+            }
+        }
+        
+        async function updateFeedbackStatus(id, status) {
+            try {
+                await fetch(`/api/feedbacks/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                loadFeedbacks(); // Reload feedbacks
+            } catch (error) {
+                console.error('Error updating feedback status:', error);
+                alert('Error updating status. Please try again.');
+            }
+        }
+        
+        function showTab(tab) {
+            const contactsContainer = document.getElementById('contacts-container');
+            const feedbacksContainer = document.getElementById('feedbacks-container');
+            const contactsTab = document.querySelector('.tab-btn');
+            const feedbacksTab = document.querySelectorAll('.tab-btn')[1];
+            
+            if (tab === 'contacts') {
+                contactsContainer.style.display = 'block';
+                feedbacksContainer.style.display = 'none';
+                contactsTab.classList.add('active');
+                feedbacksTab.classList.remove('active');
+                loadContacts();
+            } else if (tab === 'feedbacks') {
+                contactsContainer.style.display = 'none';
+                feedbacksContainer.style.display = 'block';
+                contactsTab.classList.remove('active');
+                feedbacksTab.classList.add('active');
+                loadFeedbacks();
+            }
+        }
+        
+        // Load contacts on page load
+        loadContacts();
+        
+        // Remove the 30-sec interval and use WebSockets for INSTANT updates!
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // When a new contact form is submitted, instantly refresh the contacts list
+        socket.on('new-contact', () => {
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab && activeTab.textContent.includes('Contact')) {
+                loadContacts();
+            }
+        });
+
+        // When new feedback is submitted, instantly refresh the feedback list
+        socket.on('new-feedback', () => {
+             const activeTab = document.querySelector('.tab-btn.active');
+             if (activeTab && activeTab.textContent.includes('Feedback')) {
+                 loadFeedbacks();
+             }
+        });
+    </script>
+</body>
+</html>
